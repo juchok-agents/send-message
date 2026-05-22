@@ -6,6 +6,25 @@ const args = parseArgs(process.argv.slice(3));
 if (command === "list") {
   const result = await request("/messages/threads", { method: "GET" });
   print(result);
+} else if (command === "participants") {
+  const result = await request("/messages/participants", {
+    body: JSON.stringify({
+      chat: args.chat,
+      threadId: args.thread,
+    }),
+    method: "POST",
+  });
+  print(result);
+} else if (command === "history" || command === "messages") {
+  const result = await request("/messages/history", {
+    body: JSON.stringify({
+      chat: args.chat,
+      limit: args.limit,
+      threadId: args.thread,
+    }),
+    method: "POST",
+  });
+  print(result);
 } else if (command === "send") {
   const text = args.stdin ? await Bun.stdin.text() : args.text;
   const result = await request("/messages/send", {
@@ -18,7 +37,7 @@ if (command === "list") {
   });
   print(result);
 } else {
-  throw new Error("Unknown command. Use `list` or `send`.");
+  throw new Error("Unknown command. Use `list`, `participants`, `history`, `messages`, or `send`.");
 }
 
 async function request(path: string, init: RequestInit) {
@@ -74,6 +93,7 @@ function parseArgs(argv: string[]) {
 
   return {
     chat: stringArg(values.chat),
+    limit: numberArg(values.limit),
     stdin: values.stdin === true,
     text: stringArg(values.text),
     thread: stringArg(values.thread),
@@ -82,6 +102,17 @@ function parseArgs(argv: string[]) {
 
 function stringArg(value: unknown) {
   return typeof value === "string" && value.trim() ? value.trim() : undefined;
+}
+
+function numberArg(value: unknown) {
+  if (value === undefined) {
+    return undefined;
+  }
+  const parsed = Number(value);
+  if (!Number.isInteger(parsed) || parsed <= 0) {
+    throw new Error("limit must be a positive integer.");
+  }
+  return parsed;
 }
 
 function print(value: unknown) {

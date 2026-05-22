@@ -1,11 +1,11 @@
 ---
 name: send-message
-description: Use when the agent needs to send a message to a known chat thread through the local chat adapter host.
+description: Use when the agent needs to inspect known chat threads, inspect recent chat metadata, list known participants, or send a message through the local chat adapter host.
 ---
 
-# Send Message
+# Chat Adapter
 
-Use this skill to send messages through the local chat adapter host.
+Use this skill to work with chats through the local chat adapter host.
 
 The skill talks to the agent's local control server. It expects `CONTROL_TOKEN` to be available in the environment. Override the control server URL with `AGENT_CONTROL_URL` when needed. The default URL is `http://127.0.0.1:8787`.
 
@@ -16,6 +16,27 @@ bun "$MEMORY_DIR/main/skills/send-message/send.ts" list
 ```
 
 The output contains known `threadId` values and chat titles. A chat becomes known after the bot has seen a message in that chat.
+
+## List Known Participants
+
+```bash
+bun "$MEMORY_DIR/main/skills/send-message/send.ts" participants --chat "japan"
+```
+
+```bash
+bun "$MEMORY_DIR/main/skills/send-message/send.ts" participants --thread "telegram:-1003908975751"
+```
+
+The output contains participants observed by the bot in that chat, with user ids, names, last seen time, and message count.
+
+## Inspect Recent Messages
+
+```bash
+bun "$MEMORY_DIR/main/skills/send-message/send.ts" history --chat "japan" --limit 20
+```
+
+The output contains recent message metadata: author, time, text preview, attachments, reply context, and forwarded-message context.
+`messages` is an alias for `history`.
 
 ## Send To A Thread
 
