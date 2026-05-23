@@ -25,6 +25,16 @@ if (command === "list") {
     method: "POST",
   });
   print(result);
+} else if (command === "attachments" || command === "files") {
+  const result = await request("/messages/attachments", {
+    body: JSON.stringify({
+      chat: args.chat,
+      messageId: args.message,
+      threadId: args.thread,
+    }),
+    method: "POST",
+  });
+  print(result);
 } else if (command === "send") {
   const text = args.stdin ? await Bun.stdin.text() : args.text;
   const result = await request("/messages/send", {
@@ -37,7 +47,7 @@ if (command === "list") {
   });
   print(result);
 } else {
-  throw new Error("Unknown command. Use `list`, `participants`, `history`, `messages`, or `send`.");
+  throw new Error("Unknown command. Use `list`, `participants`, `history`, `messages`, `attachments`, `files`, or `send`.");
 }
 
 async function request(path: string, init: RequestInit) {
@@ -94,6 +104,7 @@ function parseArgs(argv: string[]) {
   return {
     chat: stringArg(values.chat),
     limit: numberArg(values.limit),
+    message: stringArg(values.message),
     stdin: values.stdin === true,
     text: stringArg(values.text),
     thread: stringArg(values.thread),

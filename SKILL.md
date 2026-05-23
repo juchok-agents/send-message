@@ -1,6 +1,6 @@
 ---
 name: send-message
-description: Use when the agent needs to inspect known chat threads, inspect recent chat metadata, list known participants, or send a message through the local chat adapter host.
+description: Use when the agent needs to inspect known chat threads, inspect recent chat metadata, list known participants, find local files saved from chat attachments, or send a message through the local chat adapter host.
 ---
 
 # Chat Adapter
@@ -37,6 +37,21 @@ bun "$MEMORY_DIR/main/skills/send-message/send.ts" history --chat "japan" --limi
 
 The output contains recent message metadata: author, time, text preview, attachments, reply context, and forwarded-message context.
 `messages` is an alias for `history`.
+
+## Inspect Saved Attachments
+
+```bash
+bun "$MEMORY_DIR/main/skills/send-message/send.ts" attachments --chat "japan"
+```
+
+```bash
+bun "$MEMORY_DIR/main/skills/send-message/send.ts" attachments \
+  --thread "telegram:-1003908975751" \
+  --message "345"
+```
+
+The output contains saved attachment metadata and local file paths. Attachments are files on disk; inspect them with normal shell tools. Use PDF parsers for PDFs, image tools for images, video tools for videos, archive tools for archives, and scripts when needed.
+`files` is an alias for `attachments`.
 
 ## Send To A Thread
 
