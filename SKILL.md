@@ -1,11 +1,13 @@
 ---
 name: send-message
-description: Use when the agent needs to inspect known chat threads, inspect recent chat metadata, list known participants, find local files saved from chat attachments, or send a message through the local chat adapter host.
+description: Use when the agent needs to inspect known chat threads, inspect recent chat metadata, list known participants, find local files saved from chat attachments, send files, or send an out-of-band message through the local chat adapter host.
 ---
 
 # Chat Adapter
 
 Use this skill to work with chats through the local chat adapter host.
+
+Do not use this skill to deliver the normal reply to the current incoming message. The chat host sends the final assistant response automatically. For ordinary replies, answer normally in the final assistant message.
 
 The skill talks to the agent's local control server. It expects `CONTROL_TOKEN` to be available in the environment. Override the control server URL with `AGENT_CONTROL_URL` when needed. The default URL is `http://127.0.0.1:8787`.
 
@@ -55,7 +57,11 @@ The output contains saved attachment metadata and local file paths. Attachments 
 
 ## Send To A Thread
 
-Use the current turn's `Thread id` when sending to the active conversation.
+Use `send` for proactive messages, scheduled messages, messages to another known chat, or files that must be attached to a chat.
+
+When sending files to the active conversation, use the current turn's `Thread id`.
+
+Do not use `send` for a plain text answer to the current incoming message.
 
 ```bash
 bun "$MEMORY_DIR/main/skills/send-message/send.ts" send \
