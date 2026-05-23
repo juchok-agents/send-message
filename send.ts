@@ -1,5 +1,7 @@
 #!/usr/bin/env bun
 
+import { resolve } from "node:path";
+
 const command = process.argv[2];
 const args = parseArgs(process.argv.slice(3));
 
@@ -40,6 +42,7 @@ if (command === "list") {
   const result = await request("/messages/send", {
     body: JSON.stringify({
       chat: args.chat,
+      files: args.files,
       text,
       threadId: args.thread,
     }),
@@ -79,7 +82,7 @@ function controlUrl() {
 }
 
 function parseArgs(argv: string[]) {
-  const values: Record<string, string | boolean> = {};
+  const values: Record<string, string | string[] | boolean> = {};
 
   for (let i = 0; i < argv.length; i += 1) {
     const arg = argv[i];
@@ -97,12 +100,19 @@ function parseArgs(argv: string[]) {
     if (!value || value.startsWith("--")) {
       throw new Error(`Missing value for ${arg}`);
     }
-    values[key] = value;
+    if (key === "file") {
+      const files = Array.isArray(values.file) ? values.file : [];
+      files.push(resolve(value));
+      values.file = files;
+    } else {
+      values[key] = value;
+    }
     i += 1;
   }
 
   return {
     chat: stringArg(values.chat),
+    files: stringArrayArg(values.file),
     limit: numberArg(values.limit),
     message: stringArg(values.message),
     stdin: values.stdin === true,
@@ -113,6 +123,10 @@ function parseArgs(argv: string[]) {
 
 function stringArg(value: unknown) {
   return typeof value === "string" && value.trim() ? value.trim() : undefined;
+}
+
+function stringArrayArg(value: unknown) {
+  return Array.isArray(value) ? value.filter((item): item is string => typeof item === "string" && item.trim().length > 0) : undefined;
 }
 
 function numberArg(value: unknown) {

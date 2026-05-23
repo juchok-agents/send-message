@@ -63,6 +63,16 @@ bun "$MEMORY_DIR/main/skills/send-message/send.ts" send \
   --text "Message text"
 ```
 
+Attach local files with one or more `--file` arguments. Relative paths are resolved by this CLI before it calls the local control server. `--text` is optional when at least one file is attached.
+
+```bash
+bun "$MEMORY_DIR/main/skills/send-message/send.ts" send \
+  --thread "telegram:-1003908975751" \
+  --text "Generated file" \
+  --file "./out/image.png" \
+  --file "./report.pdf"
+```
+
 ## Send By Chat Title
 
 ```bash
