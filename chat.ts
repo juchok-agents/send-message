@@ -37,6 +37,14 @@ if (command === "list") {
     method: "POST",
   });
   print(result);
+} else if (command === "attachment-download" || command === "download") {
+  const result = await request("/messages/attachments/download", {
+    body: JSON.stringify({
+      id: requiredArg(args.id, "id"),
+    }),
+    method: "POST",
+  });
+  print(result);
 } else if (command === "send") {
   const text = args.stdin ? await Bun.stdin.text() : args.text;
   const result = await request("/messages/send", {
@@ -50,7 +58,7 @@ if (command === "list") {
   });
   print(result);
 } else {
-  throw new Error("Unknown command. Use `list`, `participants`, `history`, `messages`, `attachments`, `files`, or `send`.");
+  throw new Error("Unknown command. Use `list`, `participants`, `history`, `messages`, `attachments`, `files`, `attachment-download`, or `send`.");
 }
 
 async function request(path: string, init: RequestInit) {
@@ -113,12 +121,20 @@ function parseArgs(argv: string[]) {
   return {
     chat: stringArg(values.chat),
     files: stringArrayArg(values.file),
+    id: stringArg(values.id),
     limit: numberArg(values.limit),
     message: stringArg(values.message),
     stdin: values.stdin === true,
     text: stringArg(values.text),
     thread: stringArg(values.thread),
   };
+}
+
+function requiredArg(value: string | undefined, name: string) {
+  if (!value) {
+    throw new Error(`${name} is required.`);
+  }
+  return value;
 }
 
 function stringArg(value: unknown) {
