@@ -37,7 +37,7 @@ The output contains participants observed by the bot in that chat, with user ids
 agent-chat history --chat "japan" --limit 20
 ```
 
-The output contains recent message metadata: author, time, text preview, attachments, reply context, and forwarded-message context.
+The output contains recent messages with author, time, text, attachment ids, and reply or forwarded context when present.
 `messages` is an alias for `history`.
 
 ## Inspect Attachments
