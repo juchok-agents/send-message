@@ -9,12 +9,12 @@ Use this skill to work with chats through the local chat adapter host.
 
 Do not use this skill to deliver the normal reply to the current incoming message. The chat host sends the final assistant response automatically. For ordinary replies, answer normally in the final assistant message.
 
-The skill talks to the agent's local control server. It expects `CONTROL_TOKEN` to be available in the environment. Override the control server URL with `AGENT_CONTROL_URL` when needed. The default URL is `http://127.0.0.1:8787`.
+The skill talks to the agent's local control server. Use `agent-send-message` in deployed chat-host containers; it loads the required local control environment.
 
 ## List Known Chats
 
 ```bash
-bun "$MEMORY_DIR/main/skills/send-message/send.ts" list
+agent-send-message list
 ```
 
 The output contains known `threadId` values and chat titles. A chat becomes known after the bot has seen a message in that chat.
@@ -22,11 +22,11 @@ The output contains known `threadId` values and chat titles. A chat becomes know
 ## List Known Participants
 
 ```bash
-bun "$MEMORY_DIR/main/skills/send-message/send.ts" participants --chat "japan"
+agent-send-message participants --chat "japan"
 ```
 
 ```bash
-bun "$MEMORY_DIR/main/skills/send-message/send.ts" participants --thread "telegram:-1003908975751"
+agent-send-message participants --thread "telegram:-1003908975751"
 ```
 
 The output contains participants observed by the bot in that chat, with user ids, names, last seen time, and message count.
@@ -34,7 +34,7 @@ The output contains participants observed by the bot in that chat, with user ids
 ## Inspect Recent Messages
 
 ```bash
-bun "$MEMORY_DIR/main/skills/send-message/send.ts" history --chat "japan" --limit 20
+agent-send-message history --chat "japan" --limit 20
 ```
 
 The output contains recent message metadata: author, time, text preview, attachments, reply context, and forwarded-message context.
@@ -43,11 +43,11 @@ The output contains recent message metadata: author, time, text preview, attachm
 ## Inspect Saved Attachments
 
 ```bash
-bun "$MEMORY_DIR/main/skills/send-message/send.ts" attachments --chat "japan"
+agent-send-message attachments --chat "japan"
 ```
 
 ```bash
-bun "$MEMORY_DIR/main/skills/send-message/send.ts" attachments \
+agent-send-message attachments \
   --thread "telegram:-1003908975751" \
   --message "345"
 ```
@@ -64,7 +64,7 @@ When sending files to the active conversation, use the current turn's `Thread id
 Do not use `send` for a plain text answer to the current incoming message.
 
 ```bash
-bun "$MEMORY_DIR/main/skills/send-message/send.ts" send \
+agent-send-message send \
   --thread "telegram:-1003908975751" \
   --text "Message text"
 ```
@@ -72,7 +72,7 @@ bun "$MEMORY_DIR/main/skills/send-message/send.ts" send \
 Attach local files with one or more `--file` arguments. Relative paths are resolved by this CLI before it calls the local control server. `--text` is optional when at least one file is attached.
 
 ```bash
-bun "$MEMORY_DIR/main/skills/send-message/send.ts" send \
+agent-send-message send \
   --thread "telegram:-1003908975751" \
   --text "Generated file" \
   --file "./out/image.png" \
@@ -82,7 +82,7 @@ bun "$MEMORY_DIR/main/skills/send-message/send.ts" send \
 ## Send By Chat Title
 
 ```bash
-bun "$MEMORY_DIR/main/skills/send-message/send.ts" send \
+agent-send-message send \
   --chat "japan" \
   --text "Message text"
 ```
@@ -92,9 +92,21 @@ If a chat title is ambiguous, use `--thread`.
 ## Long Messages
 
 ```bash
-cat message.md | bun "$MEMORY_DIR/main/skills/send-message/send.ts" send \
+cat message.md | agent-send-message send \
   --thread "telegram:-1003908975751" \
   --stdin
 ```
 
 The CLI fails loudly when the control server, token, chat, or message text is missing.
+
+## Cron
+
+Cron runs with a minimal environment. Use the wrapper from crontab entries and scripts:
+
+```bash
+agent-send-message send \
+  --thread "telegram:-1003908975751" \
+  --text "Scheduled message"
+```
+
+For larger scripts, source `/agent/state/cron.env` before using other local agent commands.
