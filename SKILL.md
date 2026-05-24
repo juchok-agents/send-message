@@ -60,7 +60,7 @@ The output contains attachment ids and local file paths when files are already d
 Incoming messages may mention attachments only as ids.
 
 ```bash
-agent-chat attachment-download --id "message-id:0"
+agent-chat attachment-download --id "m1-a1"
 ```
 
 The command returns a local file path. Inspect downloaded files with normal shell tools: Pi `read` for images, PDF parsers for PDFs, media tools for audio/video, archive tools for archives, and scripts when needed.
