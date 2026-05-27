@@ -9,7 +9,13 @@ Use this skill to work with chats through the local chat adapter host.
 
 Do not use this skill to deliver the normal reply to the current incoming message. The chat host sends the final assistant response automatically. For ordinary replies, answer normally in the final assistant message.
 
-The skill talks to the agent's local control server. Use `agent-chat` in deployed chat-host containers; it loads the required local control environment.
+The skill talks to the agent's local control server. Use `agent-chat` in deployed chat-host containers; it loads the required local control environment. Do not call `chat.ts` directly unless debugging.
+
+When debugging directly, `AGENT_CONTROL_URL` must point to the control API root:
+
+```bash
+AGENT_CONTROL_URL=http://127.0.0.1:8787/control node --no-warnings /memory/skills/chat-adapter/chat.ts list
+```
 
 ## List Known Chats
 

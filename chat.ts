@@ -1,4 +1,4 @@
-#!/usr/bin/env bun
+#!/usr/bin/env node
 
 import { resolve } from "node:path";
 
@@ -46,7 +46,7 @@ if (command === "list") {
   });
   print(result);
 } else if (command === "send") {
-  const text = args.stdin ? await Bun.stdin.text() : args.text;
+  const text = args.stdin ? await readStdin() : args.text;
   const result = await request("/messages/send", {
     body: JSON.stringify({
       chat: args.chat,
@@ -86,7 +86,7 @@ async function request(path: string, init: RequestInit) {
 }
 
 function controlUrl() {
-  return (process.env.AGENT_CONTROL_URL ?? `http://127.0.0.1:${process.env.CONTROL_PORT ?? "8787"}`).replace(/\/+$/, "");
+  return (process.env.AGENT_CONTROL_URL ?? `http://127.0.0.1:${process.env.CONTROL_PORT ?? "8787"}/control`).replace(/\/+$/, "");
 }
 
 function parseArgs(argv: string[]) {
@@ -158,4 +158,14 @@ function numberArg(value: unknown) {
 
 function print(value: unknown) {
   process.stdout.write(`${JSON.stringify(value, null, 2)}\n`);
+}
+
+async function readStdin() {
+  const chunks: Buffer[] = [];
+
+  for await (const chunk of process.stdin) {
+    chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
+  }
+
+  return Buffer.concat(chunks).toString("utf8");
 }
